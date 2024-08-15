@@ -14,23 +14,30 @@ public class MainThreadDispatcher : MonoBehaviour
     {
         get
         {
-            if (!_instance)
-            {
-                _instance = FindObjectOfType<MainThreadDispatcher>();
+            //if (!_instance)
+            //{
+            //    _instance = FindObjectOfType<MainThreadDispatcher>();
 
-                if (!_instance)
-                {
-                    var obj = new GameObject("UnityMainThreadDispatcher");
-                    _instance = obj.AddComponent<MainThreadDispatcher>();
-                    DontDestroyOnLoad(obj);
-                }
-            }
+            //    if (!_instance)
+            //    {
+            //        var obj = new GameObject("UnityMainThreadDispatcher");
+            //        _instance = obj.AddComponent<MainThreadDispatcher>();
+            //        DontDestroyOnLoad(obj);
+            //    }
+            //}
 
             return _instance;
         }
     }
+	private void Awake()
+	{
+        if (!_instance)
+        {
+            _instance = this;
+        }
+	}
 
-    public void Enqueue(Action action)
+	public void Enqueue(Action action)
     {
         if (action == null)
             throw new ArgumentNullException(nameof(action));

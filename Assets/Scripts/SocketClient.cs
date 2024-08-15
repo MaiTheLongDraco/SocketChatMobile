@@ -51,6 +51,7 @@ public class SocketClient:MonoBehaviour
 			if (ConnectionStatus == ConnectionStatus.Success)
 			{
 				OnConnectSuccess?.Invoke();
+			Debug.Log($"connection success 2");
 				request.BeginReceive(dataReceiveBuffer, 0, dataReceiveBuffer.Length, SocketFlags.None, OnReceiveCallBack, null);
 			}
 		}
