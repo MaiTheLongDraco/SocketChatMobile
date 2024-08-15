@@ -20,6 +20,7 @@ public class UIManager : MonoBehaviour
 	}
 	public void OnConnected()
     {
+	    Debug.Log($"invoke on connect success");
 		waitingUI.SetActive(false);
 		connectUI.SetActive(true);
 		connectFailUI.SetActive(false);
@@ -27,6 +28,7 @@ public class UIManager : MonoBehaviour
 	}
 	public void OnConnectFail(string msg)
 	{
+		Debug.Log($"invoke on connect fail");
 		connectFailUI.SetActive(true);
 		connectFailUI.GetComponentInChildren<Text>().text = msg;
 	}

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 [Serializable]
@@ -27,13 +28,18 @@ public class SocketClient:MonoBehaviour
 			Console.ReadLine();
 		}
 
+		private void Start()
+		{
+			MainThreadDispatcher.Enqueue("connectSuccess",(() => {OnConnectSuccess?.Invoke();}));
+		}
+
 		private  void OnConnectCallback(IAsyncResult ar)
 		{
 			try
 			{
 				request.EndConnect(ar);
 				Debug.Log("connect to server success");
-				OnConnectSuccess?.Invoke();
+				MainThreadDispatcher.Dequeue("connectSuccess");
 				byte[] buffer = Encoding.UTF8.GetBytes(hello);
 				request.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, OnSendDataToServer, null);
 			}
