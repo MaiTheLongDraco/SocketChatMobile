@@ -8,9 +8,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject waitingUI;
     [SerializeField] private GameObject connectUI;
     [SerializeField] private GameObject connectFailUI;
+	private SocketClient socketClient=>SocketClient.Instance;
 	private void Start()
 	{
 		OnStartApp();
+		socketClient.OnConnectSuccess += OnConnected;
+		socketClient.OnConnectFail += OnConnectFail;
 	}
 	public void OnStartApp()
     {

@@ -8,7 +8,7 @@ public class AppMath
 {
 	public static void ConvertStructeToByteArr<T>(T structure, ref int size, ref byte[] output)
 	{
-		size = Marshal.SizeOf(structure);
+		size = Marshal.SizeOf(typeof(T));
 		if (size <= 0) return;
 		IntPtr ptr = Marshal.AllocHGlobal(size);
 		Marshal.StructureToPtr(structure, ptr, false);

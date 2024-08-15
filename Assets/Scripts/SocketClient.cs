@@ -10,17 +10,25 @@ using UnityEngine.Events;
 [Serializable]
 public class SocketClient:MonoBehaviour
 {
+	private static SocketClient instance;
+	public static SocketClient Instance {  get { return instance; } }
 		public  string Host = "127.0.0.1";
 		public  int Port = 1234;
 		public  Socket request;
 		public  string hello = "Hello from client";
 		public  byte[] dataReceiveBuffer = new byte[1024];
-		public UnityEvent OnConnectSuccess;
-		public UnityEvent<string> OnConnectFail;
-		public UnityEvent<object> OnReceiveSuccess;
-		public UnityEvent<string> OnReceiveFail;
+		public UnityAction OnConnectSuccess;
+		public UnityAction<string> OnConnectFail;
+		public UnityAction<object> OnReceiveSuccess;
+		public UnityAction<string> OnReceiveFail;
 		public ConnectionStatus ConnectionStatus;
-		public  void Connect()
+	public string UserName;
+	private void Awake()
+	{
+		if(instance == null)instance = this;
+		else if(instance!=this)Destroy(this);
+	}
+	public  void Connect()
 		{
 			request = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			IPAddress iPAddress = IPAddress.Parse(Host);
@@ -45,13 +53,18 @@ public class SocketClient:MonoBehaviour
 				OnConnectFail?.Invoke(ex.ToString());
 			}
 		}
-
+			public void Send<T>(T data)
+			{
+			int size = 0;
+			byte[] buffer = new byte[size];
+			AppMath.ConvertStructeToByteArr(data, ref size, ref buffer);
+			request.BeginSend(buffer,0,buffer.Length,SocketFlags.None, OnSendDataToServer, null);
+			}
 		private void BeginReceive()
 		{
 			if (ConnectionStatus == ConnectionStatus.Success)
 			{
 				OnConnectSuccess?.Invoke();
-			Debug.Log($"connection success 2");
 				request.BeginReceive(dataReceiveBuffer, 0, dataReceiveBuffer.Length, SocketFlags.None, OnReceiveCallBack, null);
 			}
 		}
