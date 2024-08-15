@@ -19,6 +19,7 @@ public class SocketClient:MonoBehaviour
 		public UnityEvent<string> OnConnectFail;
 		public UnityEvent<object> OnReceiveSuccess;
 		public UnityEvent<string> OnReceiveFail;
+		public ConnectionStatus ConnectionStatus;
 		public  void Connect()
 		{
 			request = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -27,19 +28,14 @@ public class SocketClient:MonoBehaviour
 			request.BeginConnect(endPoint, OnConnectCallback, null);
 			Console.ReadLine();
 		}
-
-		private void Start()
-		{
-			MainThreadDispatcher.Enqueue("connectSuccess",(() => {OnConnectSuccess?.Invoke();}));
-		}
-
 		private  void OnConnectCallback(IAsyncResult ar)
 		{
 			try
 			{
 				request.EndConnect(ar);
 				Debug.Log("connect to server success");
-				MainThreadDispatcher.Dequeue("connectSuccess");
+				ConnectionStatus = ConnectionStatus.Success;
+				MainThreadDispatcher.Instance.Enqueue(BeginReceive);
 				byte[] buffer = Encoding.UTF8.GetBytes(hello);
 				request.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, OnSendDataToServer, null);
 			}
@@ -48,8 +44,15 @@ public class SocketClient:MonoBehaviour
 				Console.WriteLine("connect to server fail " + ex.ToString());
 				OnConnectFail?.Invoke(ex.ToString());
 			}
+		}
 
-
+		private void BeginReceive()
+		{
+			if (ConnectionStatus == ConnectionStatus.Success)
+			{
+				OnConnectSuccess?.Invoke();
+				request.BeginReceive(dataReceiveBuffer, 0, dataReceiveBuffer.Length, SocketFlags.None, OnReceiveCallBack, null);
+			}
 		}
 
 		private  void OnSendDataToServer(IAsyncResult ar)
@@ -81,4 +84,11 @@ public class SocketClient:MonoBehaviour
 				request.BeginReceive(dataReceiveBuffer, 0, byteRead, SocketFlags.None, OnReceiveCallBack, null);
 			}
 		}
+}
+
+public enum ConnectionStatus
+{
+	None,
+	Success,
+	Error
 }

@@ -6,26 +6,58 @@ using UnityEngine;
 
 public class MainThreadDispatcher : MonoBehaviour
 {
-    public static readonly Dictionary<string,Action> ActionsQueue = new Dictionary<string, Action>();
+    private static readonly Queue<Action> _executionQueue = new Queue<Action>();
 
-    public static void Enqueue(string key,Action newAction)
+    private static MainThreadDispatcher _instance;
+
+    public static MainThreadDispatcher Instance
     {
-        if(newAction==null||ActionsQueue.ContainsKey(key))return;
-        lock (ActionsQueue)
+        get
         {
-            ActionsQueue.Add(key,newAction);
+            if (!_instance)
+            {
+                _instance = FindObjectOfType<MainThreadDispatcher>();
+
+                if (!_instance)
+                {
+                    var obj = new GameObject("UnityMainThreadDispatcher");
+                    _instance = obj.AddComponent<MainThreadDispatcher>();
+                    DontDestroyOnLoad(obj);
+                }
+            }
+
+            return _instance;
         }
     }
 
-    public static void Dequeue(string key)
+    public void Enqueue(Action action)
     {
-        lock (ActionsQueue)
+        if (action == null)
+            throw new ArgumentNullException(nameof(action));
+
+        lock (_executionQueue)
         {
-            if (ActionsQueue.ContainsKey(key))
-            {
-                ActionsQueue[key]?.Invoke();
-            } 
+            _executionQueue.Enqueue(action);
         }
-       
+    }
+
+    private void Update()
+    {
+        if (_executionQueue.Count > 0)
+        {
+            lock (_executionQueue)
+            {
+                while (_executionQueue.Count > 0)
+                {
+                    var action = _executionQueue.Dequeue();
+                    action?.Invoke();
+                }
+            }
+        }
+    }
+
+    public static void RunOnMainThread(Action action)
+    {
+        Instance.Enqueue(action);
     }
 }
