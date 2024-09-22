@@ -8,7 +8,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject waitingUI;
     [SerializeField] private GameObject connectUI;
     [SerializeField] private GameObject connectFailUI;
-	private SocketClient socketClient=>SocketClient.Instance;
+	[SerializeField] private TCPClientChat socketClient;
 	private void Start()
 	{
 		OnStartApp();

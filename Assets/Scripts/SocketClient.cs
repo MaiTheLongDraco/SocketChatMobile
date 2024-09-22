@@ -76,15 +76,20 @@ public class SocketClient:MonoBehaviour
 			{
 				Debug.Log($" send data success");
 			}
-			request.BeginReceive(dataReceiveBuffer, 0, dataReceiveBuffer.Length, SocketFlags.None, OnReceiveCallBack, null);
+			//request.BeginReceive(dataReceiveBuffer, 0, dataReceiveBuffer.Length, SocketFlags.None, OnReceiveCallBack, null);
 		}
 
 		private  void OnReceiveCallBack(IAsyncResult ar)
 		{
+		try
+		{
 			int byteRead = request.EndReceive(ar);
+			Debug.Log($" byte read from server {byteRead}");
 			if (byteRead > 0)
 			{
-				ST_DATA_TRANFER sT_DATA_TRANFER = default(ST_DATA_TRANFER);
+				ST_DATA_TRANFER sT_DATA_TRANFER = new ST_DATA_TRANFER() { DataBool=false,
+				DataByteArr= new byte[byteRead],DataInt=0,DataString="",DataUshort=0
+				};
 				AppMath.ConvertByteArrToStructure(dataReceiveBuffer, byteRead, ref sT_DATA_TRANFER);
 				//Console.WriteLine("receive data success");
 				StringBuilder sb = new StringBuilder();
@@ -92,12 +97,19 @@ public class SocketClient:MonoBehaviour
 				sb.AppendLine(sT_DATA_TRANFER.DataUshort.ToString());
 				sb.AppendLine(sT_DATA_TRANFER.DataBool.ToString());
 				sb.AppendLine(sT_DATA_TRANFER.DataString.ToString());
+				sb.AppendLine(sT_DATA_TRANFER.DataByteArr.Length.ToString());
+				sb.AppendLine(sT_DATA_TRANFER.DataUshort.ToString());
 				//sb.AppendLine(sT_DATA_TRANFER.DataByteArr.Count().ToString());
 				Debug.Log($"message from server {sb.ToString()}");
 				OnReceiveSuccess?.Invoke(sT_DATA_TRANFER);
-				request.BeginReceive(dataReceiveBuffer, 0, byteRead, SocketFlags.None, OnReceiveCallBack, null);
 			}
+			request.BeginReceive(dataReceiveBuffer, 0, byteRead, SocketFlags.None, OnReceiveCallBack, null);
 		}
+		catch (SocketException ex) { 
+			Debug.Log($"cant receive msg from server due to {ex.ToString()}");
+		}
+			
+	}
 }
 
 public enum ConnectionStatus

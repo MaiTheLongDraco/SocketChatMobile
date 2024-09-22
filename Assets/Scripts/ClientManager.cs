@@ -5,8 +5,11 @@ using UnityEngine;
 public class ClientManager : MonoBehaviour
 {
    public SocketClient socketClient;
+	public TCPClientChat tCPClientChat;
+	public static ClientManager instance;
 	private void Start()
 	{
-		socketClient= GetComponentInChildren<SocketClient>();
+		instance = this;
+		tCPClientChat = GetComponentInChildren<TCPClientChat>();
 	}
 }

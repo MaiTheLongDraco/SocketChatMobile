@@ -7,7 +7,7 @@ public class WaitingUI : MonoBehaviour
 {
 	public Button ConnectBtn;
 	public InputField UsernameIP;
-	private SocketClient socketClient=>SocketClient.Instance;
+	private TCPClientChat socketClient=>ClientManager.instance.tCPClientChat;
 	private void Start()
 	{
 		ConnectBtn.onClick.RemoveAllListeners();
