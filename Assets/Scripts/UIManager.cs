@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,7 +31,7 @@ public class UIManager : MonoBehaviour
 		waitingUI.SetActive(false);
 		connectUI.SetActive(true);
 		connectFailUI.SetActive(false);
-		StartCoroutine(StartLoading());
+		_ = StartLoading();
     }
 	public void OnConnectFail(string msg)
 	{
@@ -38,14 +39,18 @@ public class UIManager : MonoBehaviour
 		connectFailUI.SetActive(true);
 		connectFailUI.GetComponentInChildren<Text>().text = msg;
 	}
-	private IEnumerator StartLoading()
+	private async UniTask StartLoading()
 	{
+		if(fillAmount.fillAmount >= 1)
+			return;
 		fillAmount.fillAmount = 0;
-		yield return new WaitForSeconds(0.3f);
+		await UniTask.WaitForSeconds(0.3f);
 		fillAmount.fillAmount += 0.1f;
-		if(fillAmount.fillAmount>=1)
-		{
-			OnLoaddingDone?.Invoke();
-		}
+		await UniTask.WaitForSeconds(0.3f);
+		_ = StartLoading();
+		await UniTask.WaitUntil(() => fillAmount.fillAmount >= 1);
+		OnLoaddingDone?.Invoke();
+
+
 	}
 }

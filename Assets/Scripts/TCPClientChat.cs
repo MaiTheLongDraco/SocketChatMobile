@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -50,12 +51,14 @@ public class TCPClientChat : MonoBehaviour
                 string receivedData = Encoding.UTF8.GetString(buffer, 0, byteCount).Trim();
                 // Có thể có nhiều thông điệp trong một buffer, tách chúng bằng '\n'
                 string[] messages = receivedData.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                connectionStatus= ConnectionStatus.Success;
+                connectionStatus = ConnectionStatus.Success;
                 foreach (var message in messages)
                 {
-                    ServerService.HandleMessage(message);
-                }
-            }
+					Debug.Log($"messages data  {message}");
+
+					//  ServerService.HandleMessage(message);
+				}
+			}
         }
         catch (Exception ex)
         {

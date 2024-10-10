@@ -7,7 +7,8 @@ using Newtonsoft.Json.Linq;
 public class ServerService : MonoBehaviour
 {
     private OperationHandler m_OperationHandler;
-
+    private static ServerService instance;
+    public static ServerService Instance { get { return instance; } }
     private void Awake()
     {
         m_OperationHandler= new OperationHandler();
