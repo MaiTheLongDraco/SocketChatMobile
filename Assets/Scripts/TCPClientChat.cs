@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.Events;
@@ -16,16 +17,15 @@ public class TCPClientChat : MonoBehaviour
     TcpClient clientSocket;
     NetworkStream stream;
     private Thread listentThread;
-    private byte[] buffer= new byte[1024];
+    private byte[] buffer= new byte[4056];
     public UnityAction<string> OnReceiveMsg;
     public UnityAction OnConnectSuccess;
     public UnityAction<string> OnConnectFail;
     public string UserName;
-    // Start is called before the first frame update
-    void Start()
-    {
-       
-    }
+    private bool isConnected = false;
+    public ServerService ServerService;
+    private string clientID = ""; // ID được server gán
+   
     public void Connect()
     {
 		clientSocket = new TcpClient();
@@ -40,48 +40,87 @@ public class TCPClientChat : MonoBehaviour
 	}
     private void ListenForMessages()
     {
+        byte[] buffer = new byte[4096];
+        int byteCount;
+
         try
         {
-			byte[] buffer = new byte[1024];
-			int byteCount = stream.Read(buffer, 0, buffer.Length);
-			while (byteCount > 0)
-			{
-				string message = Encoding.UTF8.GetString(buffer, 0, byteCount);
-				Debug.Log($"message receive from server {message}");
-				OnReceiveMsg?.Invoke(message);
+            while ((byteCount = stream.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                string receivedData = Encoding.UTF8.GetString(buffer, 0, byteCount).Trim();
+                // Có thể có nhiều thông điệp trong một buffer, tách chúng bằng '\n'
+                string[] messages = receivedData.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 connectionStatus= ConnectionStatus.Success;
-                SendMsg($" user {UserName} has connect to server");
-			}
+                foreach (var message in messages)
+                {
+                    ServerService.HandleMessage(message);
+                }
+            }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            Debug.LogError(ex.ToString());
+            Debug.LogError("Error receiving message: " + ex.Message);
             connectionStatus= ConnectionStatus.Error;
             OnConnectFail?.Invoke(ex.ToString());
         }
+     
     }
-    public void SendMsg(string message)
+    /// <summary>
+    /// Hàm này dùng để broadcast message cho tất cả user khác
+    /// </summary>
+    /// <param name="message"></param>
+    void SendMessageToServer(string message)
     {
+        if (!isConnected) return;
+
         try
         {
-			byte[] msgBt = Encoding.UTF8.GetBytes(message);
-			stream.Write(msgBt, 0, message.Length);
+            var protocolMessage = new ProtocolMessage<string>
+            {
+                ProtocolType = (int)ClientToServerOperationCode.SendMessage,
+                Data = message
+            };
+            string json = JsonConvert.SerializeObject(protocolMessage) + "\n";
+            byte[] buffer = Encoding.UTF8.GetBytes(json);
+            stream.Write(buffer, 0, buffer.Length);
         }
-        catch(Exception e) 
+        catch (Exception ex)
         {
-            Debug.LogError($"send data fail due to {e.ToString()}");
+            Debug.LogError("Error sending message: " + ex.Message);
         }
-      
     }
-    [ContextMenu("TestSendToserver")]
-	private void SendTest()
+/// <summary>
+/// Hàm này dùng để send message đến client với 1 id cụ thể
+/// </summary>
+/// <param name="targetId"></param>
+/// <param name="message"></param>
+    void SendMessageToSpecificClient(string targetId, string message)
     {
-        byte[] msgBt = Encoding.UTF8.GetBytes($"Draco test send");
-		stream.Write(msgBt, 0, msgBt.Length);
-	}
-	// Update is called once per frame
-	void Update()
-    {
-        
+        if (!isConnected) return;
+
+        try
+        {
+            var messageDTO = new MessageDTO
+            {
+                SenderId = clientID,
+                Content = message,
+                Timestamp = DateTime.Now
+            };
+
+            var protocolMessage = new ProtocolMessage<MessageDTO>
+            {
+                ProtocolType = (int)ClientToServerOperationCode.SendMessage,
+                Data = messageDTO
+            };
+            string json = JsonConvert.SerializeObject(protocolMessage) + "\n";
+            byte[] buffer = Encoding.UTF8.GetBytes(json);
+            stream.Write(buffer, 0, buffer.Length);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Error sending message to specific client: " + ex.Message);
+        }
     }
+
+   
 }

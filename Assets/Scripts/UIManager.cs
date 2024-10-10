@@ -30,8 +30,8 @@ public class UIManager : MonoBehaviour
 		waitingUI.SetActive(false);
 		connectUI.SetActive(true);
 		connectFailUI.SetActive(false);
-
-	}
+		StartCoroutine(StartLoading());
+    }
 	public void OnConnectFail(string msg)
 	{
 		Debug.Log($"invoke on connect fail");
