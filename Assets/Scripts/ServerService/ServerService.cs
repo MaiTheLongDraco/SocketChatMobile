@@ -6,16 +6,27 @@ using Newtonsoft.Json.Linq;
 
 public class ServerService : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private OperationHandler m_OperationHandler;
+
+    private void Awake()
     {
-        
+        m_OperationHandler= new OperationHandler();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SubscribeOperationHandler<T>(
+        ServerToClientOperationCode operationCode, OperationHandler.OperationHandleDelegate<T> operationHandleDelegate)
     {
-        
+        m_OperationHandler.SubscribeOperationHandler(operationCode,operationHandleDelegate);
+    }
+
+    public void UnSubscribeOperationHandler<T>(
+        ServerToClientOperationCode operationCode, OperationHandler.OperationHandleDelegate<T> operationHandleDelegate)
+    {
+        m_OperationHandler.UnSubscribeOperationHandler(operationCode,operationHandleDelegate);
+    }
+    public void HandleMessage(string msg)
+    {
+        m_OperationHandler.HandleMessage(msg);
     }
 }
 // OperationHandler.cs
@@ -60,6 +71,8 @@ public class OperationHandler
             _handlers[operationCode].Add((operationHandleDelegate, handler));
         }
     }
+
+
 
     /// <summary>
     /// Hủy đăng ký một handler cho một operation code cụ thể.
@@ -130,6 +143,7 @@ public class OperationHandler
 // ServerToClientOperationCode.cs
 public enum ServerToClientOperationCode
 {
+    UpdatePlayerId=0,
     GetMessageResponse = 1,
     MessageReceived = 2,
     // Thêm các operation code khác nếu cần
