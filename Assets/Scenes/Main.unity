@@ -452,7 +452,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 390662128}
   m_HandleRect: {fileID: 390662127}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1826,7 +1826,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4eabc08ef91303468707686e9f592da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TcpClientChat: {fileID: 0}
+  m_TcpClientChat: {fileID: 754591468}
 --- !u!4 &1002021191
 Transform:
   m_ObjectHideFlags: 0

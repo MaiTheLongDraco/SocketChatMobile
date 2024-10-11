@@ -28,7 +28,10 @@ public class ChatUI : MonoBehaviour
 
   private void OnConnectSuccess(ClientIdDto data)
   {
-      displayName.text = serverService.GetClientName();
+      MainThreadDispatcher.Instance.Enqueue(() =>
+      {
+          displayName.text = serverService.GetClientName();
+      });
   }
   private void Send()
   {
