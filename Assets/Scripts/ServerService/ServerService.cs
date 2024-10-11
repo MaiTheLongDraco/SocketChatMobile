@@ -8,6 +8,7 @@ public class ServerService : MonoBehaviour
 {
     private OperationHandler m_OperationHandler;
     private static ServerService instance;
+  [SerializeField]  private TCPClientChat  m_TcpClientChat;
     public static ServerService Instance { get { return instance; } }
     private void Awake()
     {
@@ -15,6 +16,14 @@ public class ServerService : MonoBehaviour
         instance = this;
     }
 
+    public string GetClientName()
+    {
+        return m_TcpClientChat.UserName;
+    }
+    public string GetClientID()
+    {
+        return m_TcpClientChat.clientID;
+    }
     public void SubscribeOperationHandler<T>(
         ServerToClientOperationCode operationCode, OperationHandler.OperationHandleDelegate<T> operationHandleDelegate)
     {
@@ -29,6 +38,17 @@ public class ServerService : MonoBehaviour
     public void HandleMessage(string msg)
     {
         m_OperationHandler.HandleMessage(msg);
+    }
+
+    public void SendPublic(string message)
+    {
+        m_TcpClientChat.SendMessageToServer(message);
+    }
+
+    public void SendPrivate(string targetID, string message)
+    {
+        m_TcpClientChat.SendMessageToSpecificClient(targetID,message);
+
     }
 }
 // OperationHandler.cs
@@ -156,15 +176,31 @@ public enum ClientToServerOperationCode
 {
     GetMessage = 1,
     SendMessage = 2,
+    SendPrivateMessage = 3,
     // Thêm các operation code khác nếu cần
 }
-public struct MessageDTO
+public struct PublicMessageDTO
 {
     public string SenderId { get; set; }
+    public string SenderName { get; set; }
     public string Content { get; set; }
+    public int EmojiIndex { get; set; }
+    public DateTime Timestamp { get; set; }
+    public override string ToString()
+    {
+        return
+            $"SenderID {SenderId} SenderName {SenderName} Content {Content} EmojiIndex {EmojiIndex} TimeSend {Timestamp.ToString()}";
+    }
+}
+public struct PrivateMessageDTO
+{
+    public string SenderId { get; set; }
+    public string SenderName { get; set; }
+    public string TargetID { get; set; }
+    public string Content { get; set; }
+    public int EmojiIndex { get; set; }
     public DateTime Timestamp { get; set; }
 }
-
 // ProtocolMessage.cs
 public struct ProtocolMessage<T> 
 {
@@ -175,4 +211,3 @@ public struct ClientIdDto
 {
     public string Id;
 }
-

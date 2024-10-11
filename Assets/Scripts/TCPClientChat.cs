@@ -25,7 +25,7 @@ public class TCPClientChat : MonoBehaviour
     public string UserName;
     private bool isConnected = false;
     public ServerService ServerService;
-    [SerializeField]  private string clientID = ""; // ID được server gán
+    [SerializeField]  public string clientID = ""; // ID được server gán
 
     private void Start()
     {
@@ -80,16 +80,24 @@ public class TCPClientChat : MonoBehaviour
     /// Hàm này dùng để broadcast message cho tất cả user khác
     /// </summary>
     /// <param name="message"></param>
-    void SendMessageToServer(string message)
+ public  void SendMessageToServer(string message)
     {
         if (!isConnected) return;
 
         try
         {
-            var protocolMessage = new ProtocolMessage<string>
+            var messageDTO = new PublicMessageDTO()
+            {
+                SenderId = clientID,
+                Content = message,
+                SenderName = UserName,
+                Timestamp = DateTime.Now
+            };
+
+            var protocolMessage = new ProtocolMessage<PublicMessageDTO>
             {
                 ProtocolType = (int)ClientToServerOperationCode.SendMessage,
-                Data = message
+                Data = messageDTO
             };
             string json = JsonConvert.SerializeObject(protocolMessage) + "\n";
             byte[] buffer = Encoding.UTF8.GetBytes(json);
@@ -105,22 +113,26 @@ public class TCPClientChat : MonoBehaviour
 /// </summary>
 /// <param name="targetId"></param>
 /// <param name="message"></param>
-    void SendMessageToSpecificClient(string targetId, string message)
+
+
+public   void SendMessageToSpecificClient(string targetId, string message)
     {
         if (!isConnected) return;
 
         try
         {
-            var messageDTO = new MessageDTO
+            var messageDTO = new PrivateMessageDTO
             {
                 SenderId = clientID,
+                TargetID = targetId,
                 Content = message,
+                SenderName = UserName,
                 Timestamp = DateTime.Now
             };
 
-            var protocolMessage = new ProtocolMessage<MessageDTO>
+            var protocolMessage = new ProtocolMessage<PrivateMessageDTO>
             {
-                ProtocolType = (int)ClientToServerOperationCode.SendMessage,
+                ProtocolType = (int)ClientToServerOperationCode.SendPrivateMessage,
                 Data = messageDTO
             };
             string json = JsonConvert.SerializeObject(protocolMessage) + "\n";
