@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -35,6 +34,7 @@ public class TCPClientChat : MonoBehaviour
     private void UpdatePlayerID(ClientIdDto playerIdData)
     {
         clientID = playerIdData.Id;
+        isConnected = true;
     }
     public void Connect()
     {
@@ -86,22 +86,42 @@ public class TCPClientChat : MonoBehaviour
 
         try
         {
-            var messageDTO = new PublicMessageDTO()
+            if (messageType == ClientToServerOperationCode.NotifyNewPlayer)
             {
-                SenderId = clientID,
-                Content = message,
-                SenderName = UserName,
-                Timestamp = DateTime.Now
-            };
-
-            var protocolMessage = new ProtocolMessage<PublicMessageDTO>
+                var messageDTO = new NotifyNewPlayerDTO()
+                {
+                    SenderId = clientID,
+                    Content = message,
+                    SenderName = UserName,
+                };
+                var protocolMessage = new ProtocolMessage<NotifyNewPlayerDTO>
+                {
+                    ProtocolType = (int)messageType,
+                    Data = messageDTO
+                };
+                string json = JsonConvert.SerializeObject(protocolMessage) + "\n";
+                byte[] buffer = Encoding.UTF8.GetBytes(json);
+                Debug.Log($" send notify new player to server");
+                stream.Write(buffer, 0, buffer.Length);
+            }
+            else
             {
-                ProtocolType = (int)messageType,
-                Data = messageDTO
-            };
-            string json = JsonConvert.SerializeObject(protocolMessage) + "\n";
-            byte[] buffer = Encoding.UTF8.GetBytes(json);
-            stream.Write(buffer, 0, buffer.Length);
+                var messageDTO = new PublicMessageDTO()
+                {
+                    SenderId = clientID,
+                    Content = message,
+                    SenderName = UserName,
+                    Timestamp = DateTime.Now
+                };
+                var protocolMessage = new ProtocolMessage<PublicMessageDTO>
+                {
+                    ProtocolType = (int)messageType,
+                    Data = messageDTO
+                };
+                string json = JsonConvert.SerializeObject(protocolMessage) + "\n";
+                byte[] buffer = Encoding.UTF8.GetBytes(json);
+                stream.Write(buffer, 0, buffer.Length);
+            }
         }
         catch (Exception ex)
         {
