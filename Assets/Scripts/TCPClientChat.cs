@@ -80,7 +80,7 @@ public class TCPClientChat : MonoBehaviour
     /// Hàm này dùng để broadcast message cho tất cả user khác
     /// </summary>
     /// <param name="message"></param>
- public  void SendMessageToServer(string message)
+ public  void SendMessageToServer(string message,ClientToServerOperationCode messageType)
     {
         if (!isConnected) return;
 
@@ -96,7 +96,7 @@ public class TCPClientChat : MonoBehaviour
 
             var protocolMessage = new ProtocolMessage<PublicMessageDTO>
             {
-                ProtocolType = (int)ClientToServerOperationCode.SendMessage,
+                ProtocolType = (int)messageType,
                 Data = messageDTO
             };
             string json = JsonConvert.SerializeObject(protocolMessage) + "\n";

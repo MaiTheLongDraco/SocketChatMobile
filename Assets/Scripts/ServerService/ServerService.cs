@@ -40,9 +40,9 @@ public class ServerService : MonoBehaviour
         m_OperationHandler.HandleMessage(msg);
     }
 
-    public void SendPublic(string message)
+    public void SendPublic(string message,ClientToServerOperationCode commandType)
     {
-        m_TcpClientChat.SendMessageToServer(message);
+        m_TcpClientChat.SendMessageToServer(message,commandType);
     }
 
     public void SendPrivate(string targetID, string message)
@@ -168,6 +168,7 @@ public enum ServerToClientOperationCode
     UpdatePlayerId=0,
     GetMessageResponse = 1,
     MessageReceived = 2,
+    NotifyNewPlayer=3
     // Thêm các operation code khác nếu cần
 }
 
@@ -177,6 +178,7 @@ public enum ClientToServerOperationCode
     GetMessage = 1,
     SendMessage = 2,
     SendPrivateMessage = 3,
+    NotifyNewPlayer=4
     // Thêm các operation code khác nếu cần
 }
 public struct PublicMessageDTO
@@ -191,6 +193,13 @@ public struct PublicMessageDTO
         return
             $"SenderID {SenderId} SenderName {SenderName} Content {Content} EmojiIndex {EmojiIndex} TimeSend {Timestamp.ToString()}";
     }
+}
+
+public struct NotifyNewPlayerDTO
+{
+    public string SenderId { get; set; }
+    public string SenderName { get; set; }
+    public string Content { get; set; }
 }
 public struct PrivateMessageDTO
 {

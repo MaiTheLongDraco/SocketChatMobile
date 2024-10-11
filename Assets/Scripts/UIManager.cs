@@ -53,6 +53,7 @@ public class UIManager : MonoBehaviour
 			{
 				DisActiveOther(chatUI);
 				OnLoaddingDone?.Invoke();
+				ServerService.Instance.SendPublic($"{ServerService.Instance.GetClientName()} đã vào phòng chat",ClientToServerOperationCode.NotifyNewPlayer);
 				break;
 			}
 		}
