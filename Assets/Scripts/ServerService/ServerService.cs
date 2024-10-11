@@ -12,6 +12,7 @@ public class ServerService : MonoBehaviour
     private void Awake()
     {
         m_OperationHandler= new OperationHandler();
+        instance = this;
     }
 
     public void SubscribeOperationHandler<T>(
@@ -165,9 +166,13 @@ public struct MessageDTO
 }
 
 // ProtocolMessage.cs
-public struct ProtocolMessage<T>
+public struct ProtocolMessage<T> 
 {
     public int ProtocolType { get; set; }
     public T Data { get; set; }
+}
+public struct ClientIdDto
+{
+    public string Id;
 }
 

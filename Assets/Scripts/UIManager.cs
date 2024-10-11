@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
 	[SerializeField] private TCPClientChat socketClient;
 	[SerializeField] private Image fillAmount;
 	public UnityAction OnLoaddingDone;
+	[SerializeField]  private string clientID = ""; // ID được server gán
 	private void Start()
 	{
 		OnStartApp();
@@ -24,6 +25,12 @@ public class UIManager : MonoBehaviour
         waitingUI.SetActive(true);
         connectUI.SetActive(false);
 		connectFailUI.SetActive(false);
+		ServerService.Instance.SubscribeOperationHandler<ClientIdDto>(ServerToClientOperationCode.UpdatePlayerId,UpdatePlayerID);
+	}
+
+	private void UpdatePlayerID(ClientIdDto playerIdData)
+	{
+		clientID = playerIdData.Id;
 	}
 	public void OnConnected()
     {

@@ -25,7 +25,7 @@ public class TCPClientChat : MonoBehaviour
     public string UserName;
     private bool isConnected = false;
     public ServerService ServerService;
-    private string clientID = ""; // ID được server gán
+    [SerializeField]  private string clientID = ""; // ID được server gán
    
     public void Connect()
     {
@@ -55,8 +55,7 @@ public class TCPClientChat : MonoBehaviour
                 foreach (var message in messages)
                 {
 					Debug.Log($"messages data  {message}");
-
-					//  ServerService.HandleMessage(message);
+					ServerService.HandleMessage(message);
 				}
 			}
         }
