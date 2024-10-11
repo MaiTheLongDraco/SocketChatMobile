@@ -10,10 +10,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject waitingUI;
     [SerializeField] private GameObject connectUI;
     [SerializeField] private GameObject connectFailUI;
+    [SerializeField] private GameObject chatUI;
 	[SerializeField] private TCPClientChat socketClient;
 	[SerializeField] private Image fillAmount;
 	public UnityAction OnLoaddingDone;
-	[SerializeField]  private string clientID = ""; // ID được server gán
 	private void Start()
 	{
 		OnStartApp();
@@ -21,23 +21,14 @@ public class UIManager : MonoBehaviour
 		socketClient.OnConnectFail += OnConnectFail;
 	}
 	public void OnStartApp()
-    {
-        waitingUI.SetActive(true);
-        connectUI.SetActive(false);
-		connectFailUI.SetActive(false);
-		ServerService.Instance.SubscribeOperationHandler<ClientIdDto>(ServerToClientOperationCode.UpdatePlayerId,UpdatePlayerID);
-	}
-
-	private void UpdatePlayerID(ClientIdDto playerIdData)
 	{
-		clientID = playerIdData.Id;
+		DisActiveOther(waitingUI);
+
 	}
 	public void OnConnected()
     {
 	    Debug.Log($"invoke on connect success");
-		waitingUI.SetActive(false);
-		connectUI.SetActive(true);
-		connectFailUI.SetActive(false);
+	    DisActiveOther(connectUI);
 		_ = StartLoading();
     }
 	public void OnConnectFail(string msg)
@@ -45,19 +36,38 @@ public class UIManager : MonoBehaviour
 		Debug.Log($"invoke on connect fail");
 		connectFailUI.SetActive(true);
 		connectFailUI.GetComponentInChildren<Text>().text = msg;
+		DisActiveOther(connectFailUI);
 	}
 	private async UniTask StartLoading()
 	{
-		if(fillAmount.fillAmount >= 1)
-			return;
 		fillAmount.fillAmount = 0;
-		await UniTask.WaitForSeconds(0.3f);
-		fillAmount.fillAmount += 0.1f;
-		await UniTask.WaitForSeconds(0.3f);
-		_ = StartLoading();
-		await UniTask.WaitUntil(() => fillAmount.fillAmount >= 1);
-		OnLoaddingDone?.Invoke();
+		while (true)
+		{
+			if (fillAmount.fillAmount >= 1)
+			{
+				break;
+			}
+			fillAmount.fillAmount += 0.1f;
+			await UniTask.WaitForSeconds(Time.deltaTime+0.5f);
+			if (fillAmount.fillAmount >= 1)
+			{
+				DisActiveOther(chatUI);
+				OnLoaddingDone?.Invoke();
+				break;
+			}
+		}
+	}
 
-
+	private void DisActiveOther(GameObject go)
+	{
+		List<GameObject> listUI = new List<GameObject>();
+		listUI.Add(waitingUI);
+		listUI.Add(connectUI);
+		listUI.Add(connectFailUI);
+		listUI.Add(chatUI);
+		foreach (var ui in listUI)
+		{
+			ui.SetActive(ui == go);
+		}
 	}
 }

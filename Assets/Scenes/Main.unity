@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1403,6 +1402,7 @@ MonoBehaviour:
   connectionStatus: 0
   UserName: 
   ServerService: {fileID: 1002021190}
+  clientID: 
 --- !u!1 &838766063
 GameObject:
   m_ObjectHideFlags: 0
@@ -2748,6 +2748,7 @@ MonoBehaviour:
   waitingUI: {fileID: 42043018}
   connectUI: {fileID: 583347902}
   connectFailUI: {fileID: 1854100471}
+  chatUI: {fileID: 1223445954}
   socketClient: {fileID: 754591468}
   fillAmount: {fileID: 105935311}
 --- !u!1 &1934335932

@@ -26,7 +26,16 @@ public class TCPClientChat : MonoBehaviour
     private bool isConnected = false;
     public ServerService ServerService;
     [SerializeField]  private string clientID = ""; // ID được server gán
-   
+
+    private void Start()
+    {
+        ServerService.SubscribeOperationHandler<ClientIdDto>(ServerToClientOperationCode.UpdatePlayerId,UpdatePlayerID);
+
+    }
+    private void UpdatePlayerID(ClientIdDto playerIdData)
+    {
+        clientID = playerIdData.Id;
+    }
     public void Connect()
     {
 		clientSocket = new TcpClient();
