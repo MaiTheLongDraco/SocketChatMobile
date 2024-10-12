@@ -2146,16 +2146,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<sprite index=1> <link=PLAYER_NAME>Th\xF4ng B\xE1o</link>: <color=#00E9FF>Hi\u1EC7n
-    \u0111ang trong gian \u0111o\u1EA1n V\xF5 l\xE2m li\xEAn \u0111\u1EA5u, h\xF4m
-    nay t\u1EEB <color=yellow>18:00~19:00</color> v\xE0 <color=yellow>21:00~22:00</color>
-    c\xF3 ti\u1EBFn h\xE0nh <color=yello</color>\n<sprite name=\"Near\"> <link=PLAYER_NAME>234234sdfw</link>:
-    <color=#FFFFFFFF>werewrwe</color>\n<sprite name=\"Near\"> <link=PLAYER_NAME>234234sdfw</link>:
-    <color=#FFFFFFFF>yuyyu</color>\n<sprite name=\"Near\"> <link=PLAYER_NAME>234234sdfw</link>:
-    <color=#FFFFFFFF>rtyrtyrt</color>\n<sprite name=\"Near\"> <link=PLAYER_NAME>234234sdfw</link>:
-    <color=#FFFFFFFF>rtyrtyrty</color>\n<sprite name=\"EmojiOne_0\"> <link=PLAYER_NAME>234234sdfw</link>:
-    <color=#FFFFFFFF>ryrtyry</color>\n<sprite name=\"Near\"> <link=PLAYER_NAME>234234sdfw</link>:
-    <color=#FFFFFFFF>rtyrtyr</color>\n"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2288,6 +2279,7 @@ MonoBehaviour:
   sendButton: {fileID: 1425072607}
   targetID: 
   displayName: {fileID: 890950982}
+  chatDisplay: {fileID: 1195513404}
   commandType: 0
 --- !u!1 &1269175619
 GameObject:

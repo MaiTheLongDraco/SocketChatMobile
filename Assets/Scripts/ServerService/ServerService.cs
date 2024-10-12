@@ -209,6 +209,11 @@ public struct PrivateMessageDTO
     public string Content { get; set; }
     public int EmojiIndex { get; set; }
     public DateTime Timestamp { get; set; }
+	public override string ToString()
+	{
+		return
+			$"SenderID {SenderId} SenderName {SenderName} Content {Content} EmojiIndex {EmojiIndex} TimeSend {Timestamp.ToString()}";
+	}
 }
 // ProtocolMessage.cs
 public struct ProtocolMessage<T> 
