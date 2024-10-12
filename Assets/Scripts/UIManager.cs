@@ -12,18 +12,32 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject connectFailUI;
     [SerializeField] private GameObject chatUI;
 	[SerializeField] private TCPClientChat socketClient;
+	[SerializeField] private NotifylSlider notiSlider;
 	[SerializeField] private Image fillAmount;
+	public static UIManager instance;
 	public UnityAction OnLoaddingDone;
+	private void Awake()
+	{
+		instance = this;
+	}
 	private void Start()
 	{
 		OnStartApp();
 		socketClient.OnConnectSuccess += OnConnected;
 		socketClient.OnConnectFail += OnConnectFail;
 	}
+	public void MakeNotiSlider(string msg)
+	{
+		MainThreadDispatcher.Instance.Enqueue(() =>
+		{
+			notiSlider.Inject(msg);
+			notiSlider.gameObject.SetActive(true);
+		});
+		
+	}
 	public void OnStartApp()
 	{
 		DisActiveOther(waitingUI);
-
 	}
 	public void OnConnected()
     {
@@ -48,7 +62,7 @@ public class UIManager : MonoBehaviour
 				break;
 			}
 			fillAmount.fillAmount += 0.1f;
-			await UniTask.WaitForSeconds(Time.deltaTime+0.5f);
+			await UniTask.WaitForSeconds(Time.deltaTime+0.1f);
 			if (fillAmount.fillAmount >= 1)
 			{
 				DisActiveOther(chatUI);

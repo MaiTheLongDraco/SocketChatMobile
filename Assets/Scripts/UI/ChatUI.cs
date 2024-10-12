@@ -30,6 +30,7 @@ public class ChatUI : MonoBehaviour
   private void OnNotiNewPlayer(NotifyNewPlayerDTO data)
   {
       Debug.Log($"Sender ID {data.SenderId} sender name {data.SenderName} content {data.Content}");
+        UIManager.instance.MakeNotiSlider(data.Content);
   }
 
   private void OnConnectSuccess(ClientIdDto data)
@@ -41,14 +42,17 @@ public class ChatUI : MonoBehaviour
   }
   private void Send()
   {
-          bool isPrivate = string.Empty == targetID ? true : false;
+        string newMessgage = $" <color=#00E9FF><link=PLAYER_NAME>{serverService.GetClientName()}</link></color>: " +
+        $"<color=#FFFFFFFF>{inputTextChat.text}</color>";
+
+		  bool isPrivate = string.Empty == targetID ? true : false;
           if (isPrivate)
           {
-              serverService.SendPrivate(targetID,inputTextChat.text);
+              serverService.SendPrivate(targetID, newMessgage);
           }
           else
           {
-              serverService.SendPublic(inputTextChat.text,commandType);
+              serverService.SendPublic(newMessgage, commandType);
           }  
   }
 }
