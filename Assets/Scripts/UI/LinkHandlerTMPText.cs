@@ -57,8 +57,8 @@ public class LinkHandlerTMPText : MonoBehaviour, IPointerClickHandler
 	public void OnPointerClick(PointerEventData eventData)
 	{
 		// Kiểm tra nếu người dùng double-click
-		//if (Time.time - lastClickTime < doubleClickThreshold)
-		//{
+		if (Time.time - lastClickTime < doubleClickThreshold)
+		{
 		Debug.Log($" click on link");
 			int linkIndex = TMP_TextUtilities.FindIntersectingLink(textMeshPro, Input.mousePosition, null);
 			if (linkIndex != -1)
@@ -74,7 +74,7 @@ public class LinkHandlerTMPText : MonoBehaviour, IPointerClickHandler
 				Debug.Log("Double-clicked link with ID: " + linkID);
 				Debug.Log("Link Text: " + linkText);
 			}
-		//}
+		}
 
 		// Lưu thời gian click để kiểm tra double-click
 		lastClickTime = Time.time;
