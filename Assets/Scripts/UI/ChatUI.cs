@@ -43,7 +43,7 @@ public class ChatUI : MonoBehaviour
 	  string[] charSplit = linkID.Split("#");
 	  if(charSplit[1]==serverService.GetClientID())return;
 	  targetID = charSplit[1];
-	  UIManager.instance.GetPrivateChatUI().Inject(targetID,mousePos);
+	  UIManager.instance.GetPrivateChatUI().Inject(targetID,mousePos,linkText);
 	  UIManager.instance.GetPrivateChatUI().gameObject.SetActive(true);
 	  Debug.Log("Link Text: " + linkText+$"char split {charSplit[1]}");
   }

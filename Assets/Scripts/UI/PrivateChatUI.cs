@@ -30,10 +30,10 @@ public class PrivateChatUI : MonoBehaviour
 		serverService.SubscribeOperationHandler<PrivateMessageDTO>(ServerToClientOperationCode.GetMessageResponse, OnGetPrivateMessage);
   }
 
-  public void Inject(string targetID,Vector3 mousePos)
+  public void Inject(string targetID,Vector3 mousePos,string username)
   {
 	 this.targetID = targetID;
-	 displayName.text = this.targetID.ToString();
+	 displayName.text = username;
 	 // transform.position = mousePos;
   }
 	private void OnGetPrivateMessage(PrivateMessageDTO data)
