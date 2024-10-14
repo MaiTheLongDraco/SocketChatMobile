@@ -11,7 +11,7 @@ public class LinkHandlerTMPText : MonoBehaviour, IPointerClickHandler
 	//private TMP_Text _tmpText;
 	//[SerializeField] private Canvas _canvasCheck;
 	//[SerializeField] private Camera cameraToUse;
-	//private Action<TMP_LinkInfo, Vector3> _linkHandler;
+	private Action<TMP_LinkInfo,Vector3> _linkHandler;
 	//private void Awake()
 	//{
 	//	_tmpText = GetComponent<TMP_Text>();
@@ -33,10 +33,10 @@ public class LinkHandlerTMPText : MonoBehaviour, IPointerClickHandler
 	//	}
 	//}
 
-	//public void Inject(Action<TMP_LinkInfo, Vector3> linkHandler)
-	//{
-	//	_linkHandler = linkHandler;
-	//}
+	public void Inject(Action<TMP_LinkInfo,Vector3> linkHandler)
+	{
+		_linkHandler = linkHandler;
+	}
 
 	//public void OnPointerClick(PointerEventData eventData)
 	//{
@@ -59,20 +59,13 @@ public class LinkHandlerTMPText : MonoBehaviour, IPointerClickHandler
 		// Kiểm tra nếu người dùng double-click
 		if (Time.time - lastClickTime < doubleClickThreshold)
 		{
-		Debug.Log($" click on link");
 			int linkIndex = TMP_TextUtilities.FindIntersectingLink(textMeshPro, Input.mousePosition, null);
 			if (linkIndex != -1)
 			{
 				// Lấy thông tin của link
+				Vector3 mousePosition = new Vector3(eventData.position.x, eventData.position.y, 0);
 				TMP_LinkInfo linkInfo = textMeshPro.textInfo.linkInfo[linkIndex];
-
-				// Lấy ID hoặc thông tin link mà bạn muốn
-				string linkID = linkInfo.GetLinkID();
-				string linkText = linkInfo.GetLinkText();
-
-				// Xử lý theo logic của bạn (ví dụ in ra console hoặc làm gì đó với linkID)
-				Debug.Log("Double-clicked link with ID: " + linkID);
-				Debug.Log("Link Text: " + linkText);
+				_linkHandler?.Invoke(linkInfo, mousePosition);
 			}
 		}
 		// Lưu thời gian click để kiểm tra double-click

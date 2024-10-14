@@ -7,62 +7,38 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class ChatUI : MonoBehaviour
+public class PrivateChatUI : MonoBehaviour
 {
    [SerializeField] private TMP_InputField inputTextChat;
   [SerializeField] private ScrollRect chatViewScroll;
    [SerializeField] private Button sendButton;
+   [SerializeField] private Button closeBtn;
    [SerializeField] private string targetID;
-   [SerializeField] private Text displayName;
+   [SerializeField] private TextMeshProUGUI displayName;
    [SerializeField] private TextMeshProUGUI chatDisplay;
    [SerializeField] private ClientToServerOperationCode commandType;
    [SerializeField] private int paddingFactor;
-   [SerializeField] private LinkHandlerTMPText m_LinkHandlerTMPText;
   public ServerService serverService=>ServerService.Instance;
 
   private void Start()
   {
-	  m_LinkHandlerTMPText = GetComponentInChildren<LinkHandlerTMPText>();
-	  m_LinkHandlerTMPText.Inject(OnClickOnLinkText);
       sendButton.onClick.AddListener(Send);
-        //Lắng nghe tin nhắn public từ server
-      serverService.SubscribeOperationHandler<PublicMessageDTO>(ServerToClientOperationCode.MessageReceived,OnGetPublicMessage);
+      closeBtn.onClick.AddListener(()=>gameObject.SetActive(false));
         // Lắng nghe khi có người dùng mới vào server
       serverService.SubscribeOperationHandler<NotifyNewPlayerDTO>(ServerToClientOperationCode.NotifyNewPlayer,OnNotiNewPlayer);
-        // Lắng nghe khi connect thành công
-      serverService.SubscribeOperationHandler<ClientIdDto>(ServerToClientOperationCode.UpdatePlayerId,OnConnectSuccess);
 		//Lắng nghe tin nhắn private từ server
 		serverService.SubscribeOperationHandler<PrivateMessageDTO>(ServerToClientOperationCode.GetMessageResponse, OnGetPrivateMessage);
   }
 
-  private void OnClickOnLinkText(TMP_LinkInfo linkInfo,Vector3 mousePos)
+  public void Inject(string targetID,Vector3 mousePos)
   {
-	  // Lấy ID hoặc thông tin link mà bạn muốn
-	  string linkID = linkInfo.GetLinkID();
-	  string linkText = linkInfo.GetLinkText();Debug.Log("Double-clicked link with ID: " + linkID);
-	  string[] charSplit = linkID.Split("#");
-	  if(charSplit[1]==serverService.GetClientID())return;
-	  targetID = charSplit[1];
-	  UIManager.instance.GetPrivateChatUI().Inject(targetID,mousePos);
-	  UIManager.instance.GetPrivateChatUI().gameObject.SetActive(true);
-	  Debug.Log("Link Text: " + linkText+$"char split {charSplit[1]}");
-  }
-
-  private void OnGetPublicMessage(PublicMessageDTO data)
-    {
-        Debug.Log($"message broadcast {data.ToString()}");
-        Enqueu(() =>
-        {
-			chatDisplay.text += data.Content + "\n";
-        });
+	 this.targetID = targetID;
+	 displayName.text = this.targetID.ToString();
+	 // transform.position = mousePos;
   }
 	private void OnGetPrivateMessage(PrivateMessageDTO data)
 	{
-		Enqueu(() =>
-		{
-			chatDisplay.text += data.Content + "\n";
-		});
-		Debug.Log($"message private {data.ToString()} target ID {data.TargetID}");
+		Debug.Log($"message private {data.ToString()}");
 	}
 	private void OnNotiNewPlayer(NotifyNewPlayerDTO data)
   {
@@ -73,14 +49,6 @@ public class ChatUI : MonoBehaviour
     {
         MainThreadDispatcher.Instance.Enqueue(callBack);
     }
-  private void OnConnectSuccess(ClientIdDto data)
-  {
-      MainThreadDispatcher.Instance.Enqueue(() =>
-      {
-          displayName.text = serverService.GetClientName();
-      });
-  }
-
   public void AddEmojiToInputField(int emojiIndex)
   {
 	  string text = $"{PaddingHorizontalText(3)} <size=150%><sprite index={emojiIndex}></size>";
@@ -101,24 +69,11 @@ public class ChatUI : MonoBehaviour
   }
   private void Send()
   {
-        string newMessgage = $" <color=#00E9FF><link=PLAYER_NAME#{serverService.GetClientID()}>{serverService.GetClientName()}</link></color>: " +
-        $"<color=#FFFFFFFF>{inputTextChat.text}</color>";
 		string privateMsg = $"<color=red>[PRIVATE]</color> <color=#00E9FF><link=PLAYER_NAME#{serverService.GetClientID()}>{serverService.GetClientName()}</link></color>: " +
 	  $"<color=#FFFFFFFF>{inputTextChat.text}</color>";
-		bool isPrivate = string.Empty == targetID ? false : true;
-          if (isPrivate)
-          {
 			commandType = ClientToServerOperationCode.SendPrivateMessage;
 			serverService.SendPrivate(targetID, privateMsg);
 			chatDisplay.text +=$"<align=right>{privateMsg}</align>\n";
-
-          }
-          else
-          {
-            commandType = ClientToServerOperationCode.SendMessage;
-              serverService.SendPublic(newMessgage, commandType);
-              chatDisplay.text += $"<align=right>{newMessgage}</align>\n";
-          }
           inputTextChat.text = "";
   }
 }

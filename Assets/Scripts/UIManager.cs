@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject connectUI;
     [SerializeField] private GameObject connectFailUI;
     [SerializeField] private GameObject chatUI;
+    [SerializeField] private PrivateChatUI m_PrivateChatUI;
 	[SerializeField] private TCPClientChat socketClient;
 	[SerializeField] private NotifylSlider notiSlider;
 	[SerializeField] private Image fillAmount;
@@ -25,6 +26,11 @@ public class UIManager : MonoBehaviour
 		OnStartApp();
 		socketClient.OnConnectSuccess += OnConnected;
 		socketClient.OnConnectFail += OnConnectFail;
+	}
+
+	public PrivateChatUI GetPrivateChatUI()
+	{
+		return m_PrivateChatUI;
 	}
 	public void MakeNotiSlider(string msg)
 	{
