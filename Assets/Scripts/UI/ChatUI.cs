@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -8,13 +9,14 @@ using UnityEngine.UI;
 
 public class ChatUI : MonoBehaviour
 {
-   [SerializeField] private InputField inputTextChat;
+   [SerializeField] private TMP_InputField inputTextChat;
   [SerializeField] private ScrollRect chatViewScroll;
    [SerializeField] private Button sendButton;
    [SerializeField] private string targetID;
    [SerializeField] private Text displayName;
    [SerializeField] private TextMeshProUGUI chatDisplay;
    [SerializeField] private ClientToServerOperationCode commandType;
+   [SerializeField] private int paddingFactor;
   public ServerService serverService=>ServerService.Instance;
 
   private void Start()
@@ -58,24 +60,46 @@ public class ChatUI : MonoBehaviour
           displayName.text = serverService.GetClientName();
       });
   }
+
+  public void AddEmojiToInputField(int emojiIndex)
+  {
+	  string text = $"{PaddingHorizontalText(3)} <size=150%><sprite index={emojiIndex}></size>";
+	  inputTextChat.text += text;
+  }
+  private string PaddingHorizontalText(int numPad)
+  {
+	  StringBuilder stringBuilder = new StringBuilder();
+	  if (numPad > 0)
+	  {
+		  for (int i = 0; i < numPad; i++)
+		  {
+			  stringBuilder.Append(" ");
+		  }
+	  }
+	  return stringBuilder.ToString();
+
+  }
   private void Send()
   {
         string newMessgage = $" <color=#00E9FF><link=PLAYER_NAME>{serverService.GetClientName()}</link></color>: " +
         $"<color=#FFFFFFFF>{inputTextChat.text}</color>";
 		string privateMsg = $"<color=red>[PRIVATE]</color> <color=#00E9FF><link=PLAYER_NAME>{serverService.GetClientName()}</link></color>: " +
 	  $"<color=#FFFFFFFF>{inputTextChat.text}</color>";
-
 		bool isPrivate = string.Empty == targetID ? false : true;
           if (isPrivate)
           {
 			commandType = ClientToServerOperationCode.SendPrivateMessage;
 			serverService.SendPrivate(targetID, privateMsg);
+			chatDisplay.text +=$"<align=right>{privateMsg}</align>\n";
+
           }
           else
           {
             commandType = ClientToServerOperationCode.SendMessage;
               serverService.SendPublic(newMessgage, commandType);
-          }  
+              chatDisplay.text += $"<align=right>{newMessgage}</align>\n";
+          }
+          inputTextChat.text = "";
   }
 }
 //<sprite index=1> <link=PLAYER_NAME>Thông Báo</link>: <color=#00E9FF>Hiện đang trong gian đoạn Võ lâm liên đấu, hôm nay từ PLAYER_NAME>234234sdfw</link>: <color=#FFFFFFFF>rtyrtyrty</color>
