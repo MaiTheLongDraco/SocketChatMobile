@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -39,6 +40,7 @@ public class TCPClientChat : MonoBehaviour
     public void Connect()
     {
 		clientSocket = new TcpClient();
+        ip = GetLocalIPv4Address();
 		clientSocket.Connect(ip, port);
 		if (clientSocket != null)
 		{
@@ -128,12 +130,38 @@ public class TCPClientChat : MonoBehaviour
             Debug.LogError("Error sending message: " + ex.Message);
         }
     }
-/// <summary>
-/// Hàm này dùng để send message đến client với 1 id cụ thể
-/// </summary>
-/// <param name="targetId"></param>
-/// <param name="message"></param>
 
+    /// <summary>
+    /// Hàm này dùng để send message đến client với 1 id cụ thể
+    /// </summary>
+    /// <param name="targetId"></param>
+    /// <param name="message"></param>
+    [ContextMenu("GetLocalIPv4Address")]
+    public void ShowLocalIpV4()
+    {
+        Debug.Log($" local ipv4 {GetLocalIPv4Address()}");
+    }
+private string GetLocalIPv4Address()
+{
+    foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+    {
+        // Bỏ qua các interface không hoạt động hoặc là loopback
+        if (ni.OperationalStatus != OperationalStatus.Up ||
+            ni.NetworkInterfaceType == NetworkInterfaceType.Loopback)
+            continue;
+
+        var ipProperties = ni.GetIPProperties();
+
+        foreach (UnicastIPAddressInformation ip in ipProperties.UnicastAddresses)
+        {
+            if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+            {
+                return ip.Address.ToString();
+            }
+        }
+    }
+    return null;
+}
 
 public   void SendMessageToSpecificClient(string targetId, string message)
     {
