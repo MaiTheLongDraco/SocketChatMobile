@@ -46,6 +46,7 @@ public class ChatUI : MonoBehaviour
 	  UIManager.instance.GetPrivateChatUI().Inject(targetID,mousePos,linkText);
 	  UIManager.instance.GetPrivateChatUI().gameObject.SetActive(true);
 	  Debug.Log("Link Text: " + linkText+$"char split {charSplit[1]}");
+	  targetID = String.Empty;
   }
 
   private void OnGetPublicMessage(PublicMessageDTO data)
