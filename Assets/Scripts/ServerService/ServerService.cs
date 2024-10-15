@@ -48,7 +48,10 @@ public class ServerService : MonoBehaviour
     public void SendPrivate(string targetID, string message)
     {
         m_TcpClientChat.SendMessageToSpecificClient(targetID,message);
-
+    }
+    public void SendAudio(string targetId, byte[] data)
+    {
+        m_TcpClientChat.SendVoiceDataToServer(targetId,data);
     }
 }
 // OperationHandler.cs
@@ -168,7 +171,8 @@ public enum ServerToClientOperationCode
     UpdatePlayerId=0,
     GetMessageResponse = 1,
     MessageReceived = 2,
-    NotifyNewPlayer=3
+    NotifyNewPlayer=3,
+    AudioReceived=4
     // Thêm các operation code khác nếu cần
 }
 
@@ -178,7 +182,8 @@ public enum ClientToServerOperationCode
     GetMessage = 1,
     SendMessage = 2,
     SendPrivateMessage = 3,
-    NotifyNewPlayer=4
+    NotifyNewPlayer=4,
+    SendAudio=5
     // Thêm các operation code khác nếu cần
 }
 public struct PublicMessageDTO
@@ -224,4 +229,12 @@ public struct ProtocolMessage<T>
 public struct ClientIdDto
 {
     public string Id;
+}
+
+public struct VoiceMessagePack
+{
+    public string SenderId { get; set; }
+    public string TargetId { get; set; }
+    public string SenderName { get; set; }
+    public byte[] ByteData { get; set; }
 }

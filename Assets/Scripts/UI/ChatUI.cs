@@ -18,6 +18,11 @@ public class ChatUI : MonoBehaviour
    [SerializeField] private ClientToServerOperationCode commandType;
    [SerializeField] private int paddingFactor;
    [SerializeField] private LinkHandlerTMPText m_LinkHandlerTMPText;
+
+   public string TargetID
+   {
+	   get { return targetID; }
+   }
   public ServerService serverService=>ServerService.Instance;
 
   private void Start()

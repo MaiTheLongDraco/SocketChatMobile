@@ -131,6 +131,30 @@ public class TCPClientChat : MonoBehaviour
         }
     }
 
+    public void SendVoiceDataToServer(string targetId,byte[] byteVoice)
+    {
+        if (!isConnected) return;
+
+        try
+        {
+            VoiceMessagePack voiceMessagePack = new VoiceMessagePack()
+            {
+                SenderId = clientID,
+                TargetId = targetId,
+                SenderName = UserName,
+                ByteData = byteVoice
+            };
+                string json = JsonConvert.SerializeObject(voiceMessagePack) + "\n";
+                byte[] buffer = Encoding.UTF8.GetBytes(json);
+                Debug.Log($" send voice messgae");
+                stream.Write(buffer, 0, buffer.Length);
+         
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Error sending voice message: " + ex.Message);
+        }
+    }
     /// <summary>
     /// Hàm này dùng để send message đến client với 1 id cụ thể
     /// </summary>
